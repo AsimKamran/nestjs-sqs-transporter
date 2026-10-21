@@ -1,21 +1,7 @@
-# Dependency folders
-node_modules/
-bower_components/
-
-# Environment variables and secrets (NEVER commit these)
+node_modules
+dist
+.dev
+deployment.zip
 .env
-.env.local
-*.pem
-*.key
-
-# Operating System files
-.DS_Store
-Thumbs.db
-
-# Build and log folders
-dist/
-build/
 *.log
-
-# VS Code specific settings you might want to ignore
-.vscode/
+.DS_Store

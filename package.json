@@ -1,28 +1,37 @@
 {
   "name": "nestjs-sqs-transporter",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "version": "1.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.6"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "dev": "node scripts/run-local.js local-sqs --watch",
+    "test:local": "node scripts/run-local.js test-local",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "clean": "node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true});fs.rmSync('.dev',{recursive:true,force:true});fs.rmSync('deployment.zip',{force:true})\"",
+    "build": "npm run clean && npm run typecheck && node build.js",
+    "package": "npm run build && bestzip deployment.zip dist/main.js dist/main.js.map"
+  },
   "dependencies": {
-    "@aws-lambda-powertools/idempotency": "^2.36.0",
     "@aws-lambda-powertools/logger": "^2.36.0",
+    "@aws-lambda-powertools/metrics": "^2.36.0",
     "@nestjs/common": "^12.1.3",
     "@nestjs/core": "^12.1.3",
     "@nestjs/microservices": "^12.1.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0",
+    "@swc/core": "^1.13.5",
     "@types/aws-lambda": "^8.10.164",
-    "@types/node": "^26.6.5",
+    "@types/node": "^22.10.0",
+    "bestzip": "^2.2.1",
     "esbuild": "^0.28.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^7.0.2"
+    "typescript": "~5.9.3"
   }
 }

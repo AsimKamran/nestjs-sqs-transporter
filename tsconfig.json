@@ -1,22 +1,21 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2023"],
+    "strict": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2022",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "incremental": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "aws-lambda"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "scripts/**/*.ts", "scripts/run-local.js"]
 }
