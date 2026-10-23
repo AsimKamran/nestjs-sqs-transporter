@@ -25,6 +25,36 @@ const swcDecorators = {
   },
 };
 
+/**
+ * Nest lazily requires optional transports (nats, kafka, mqtt...). When one of them is not
+ * installed, mark it external instead of failing the bundle. It is only loaded at runtime if
+ * that transport is actually used. Unresolved imports in YOUR code still fail the build.
+ */
+const optionalNestDeps = {
+  name: "optional-nest-deps",
+  setup(build) {
+    build.onResolve({ filter: /^[^./]/ }, async (args) => {
+      if (args.pluginData?.skipOptional) return undefined;
+      if (!/node_modules[\\/]@nestjs[\\/]/.test(args.importer))
+        return undefined;
+      const r = await build.resolve(args.path, {
+        importer: args.importer,
+        resolveDir: args.resolveDir,
+        kind: args.kind,
+        pluginData: { skipOptional: true },
+      });
+      if (r.errors.length) return { path: args.path, external: true };
+      if (r.external) return { path: r.path, external: true }; // Node built-ins (stream, fs...) and listed externals
+      return {
+        path: r.path,
+        namespace: r.namespace,
+        sideEffects: r.sideEffects,
+        suffix: r.suffix,
+      };
+    });
+  },
+};
+
 const external = [
   // AWS SDK v3 ships with the Lambda Node 18+ runtime
   "@aws-sdk/*",
@@ -38,6 +68,7 @@ const external = [
   "kafkajs",
   "mqtt",
   "nats",
+  "@nats-io/*",
   "redis",
   "ioredis",
   "grpc",
@@ -54,7 +85,7 @@ const baseOptions = {
   platform: "node",
   format: "cjs",
   target: "node22",
-  plugins: [swcDecorators],
+  plugins: [optionalNestDeps, swcDecorators],
   external,
 };
 

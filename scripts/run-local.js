@@ -3,11 +3,14 @@
 //   node scripts/run-local.js test-local          -> one-shot test
 const esbuild = require("esbuild");
 const { spawn } = require("node:child_process");
+const fs = require("node:fs");
 const { baseOptions } = require("../build.config");
 
 const [entry, flag] = process.argv.slice(2);
 if (!entry) {
-  console.error("Usage: node scripts/run-local.js <local-sqs|test-local> [--watch]");
+  console.error(
+    "Usage: node scripts/run-local.js <local-sqs|test-local> [--watch]",
+  );
   process.exit(1);
 }
 const watch = flag === "--watch";
@@ -16,7 +19,15 @@ let child;
 
 function run() {
   if (child) child.kill();
-  child = spawn(process.execPath, ["--enable-source-maps", "--env-file=.env", outfile], { stdio: "inherit" });
+  // --env-file crashes Node when the file is missing, so only pass it if .env exists.
+  // Without it, every setting falls back to the defaults in src/config/env.ts.
+  const args = ["--enable-source-maps"];
+  if (fs.existsSync(".env")) args.push("--env-file=.env");
+  else
+    console.log(
+      "ℹ️  No .env file found, using default settings (copy .env.example to .env to customize).",
+    );
+  child = spawn(process.execPath, [...args, outfile], { stdio: "inherit" });
   child.on("exit", (code) => {
     if (!watch) process.exit(code ?? 0);
   });
